@@ -7,28 +7,62 @@
 using namespace std;
 
 // ДПФ
+// vector<complex<double>> dft(const vector<complex<double>>& x) {
+//     int N = x.size();
+//     vector<complex<double>> y(N);
+//     double factor = 1.0 / sqrt(N);
+    
+//     for (int k = 0; k < N; k++) {
+//         complex<double> sum(0, 0);
+//         for (int j = 0; j < N; j++) {
+//             double angle = - 2 * M_PI * j * k / N;
+//             complex<double> w(cos(angle), sin(angle));
+//             sum += x[j] * w;
+//         }
+//         y[k] = sum * factor;
+//     }
+//     return y;
+// }
+
+// // ОДПФ
+// vector<complex<double>> idft(const vector<complex<double>>& y) {
+//     int N = y.size();
+//     vector<complex<double>> x(N);
+//     double factor = 1.0 / sqrt(N);
+    
+//     for (int j = 0; j < N; j++) {
+//         complex<double> sum(0, 0);
+//         for (int k = 0; k < N; k++) {
+//             double angle = 2 * M_PI * j * k / N;
+//             complex<double> w(cos(angle), sin(angle));
+//             sum += y[k] * w;
+//         }
+//         x[j] = sum * factor;
+//     }
+//     return x;
+// }
+
+// ДПФ (совместимо с numpy.fft)
 vector<complex<double>> dft(const vector<complex<double>>& x) {
     int N = x.size();
     vector<complex<double>> y(N);
-    double factor = 1.0 / sqrt(N);
     
     for (int k = 0; k < N; k++) {
         complex<double> sum(0, 0);
         for (int j = 0; j < N; j++) {
-            double angle = - 2 * M_PI * j * k / N;
+            double angle = -2 * M_PI * j * k / N;
             complex<double> w(cos(angle), sin(angle));
             sum += x[j] * w;
         }
-        y[k] = sum * factor;
+        y[k] = sum; // без нормировки
     }
     return y;
 }
 
-// ОДПФ
+// Обратное ДПФ (совместимо с numpy.ifft)
 vector<complex<double>> idft(const vector<complex<double>>& y) {
     int N = y.size();
     vector<complex<double>> x(N);
-    double factor = 1.0 / sqrt(N);
     
     for (int j = 0; j < N; j++) {
         complex<double> sum(0, 0);
@@ -37,7 +71,7 @@ vector<complex<double>> idft(const vector<complex<double>>& y) {
             complex<double> w(cos(angle), sin(angle));
             sum += y[k] * w;
         }
-        x[j] = sum * factor;
+        x[j] = sum / (double)N; // делим только в обратном
     }
     return x;
 }

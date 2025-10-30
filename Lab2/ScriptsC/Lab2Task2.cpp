@@ -7,9 +7,69 @@
 
 using namespace std;
 
+// vector<complex<double>> fft(const vector<complex<double>>& input) {
+//     vector<complex<double>> x = input;
+//     int N = x.size();
+
+//     for (int step = N / 2; step >= 1; step /= 2) {
+//         int jump = step * 2;
+//         for (int start = 0; start < N; start += jump) {
+//             for (int k = 0; k < step; k++) {
+//                 double angle = -2.0 * M_PI * k / jump;
+//                 complex<double> w(cos(angle), sin(angle));
+
+//                 complex<double> a = x[start + k];
+//                 complex<double> b = x[start + k + step];
+
+//                 // Основные "бабочки" 
+//                 x[start + k] = a + b;
+//                 x[start + k + step] = (a - b) * w;
+//             }
+//         }
+//     }
+
+//     return x;
+// }
+
+// vector<complex<double>> ifft(const vector<complex<double>>& input) {
+//     vector<complex<double>> x = input;
+//     int N = x.size();
+
+//     for (int step = 1; step < N; step *= 2) {
+//         int jump = step * 2;
+//         for (int start = 0; start < N; start += jump) {
+//             for (int k = 0; k < step; k++) {
+//                 double angle = 2.0 * M_PI * k / jump;
+//                 complex<double> w(cos(angle), sin(angle));
+
+//                 complex<double> a = x[start + k];
+//                 complex<double> b = x[start + k + step] * w;
+
+//                 x[start + k] = a + b;
+//                 x[start + k + step] = a - b;
+//             }
+//         }
+//     }
+
+//     // нормализация
+//     for (auto &v : x) v /= N;
+
+//     return x;
+// }
+
+int bit_reverse(int n, int bits) {
+    int r = 0;
+    for (int i = 0; i < bits; i++) {
+        if (n & (1 << i))
+            r |= 1 << (bits - 1 - i);
+    }
+    return r;
+}
+
+// БПФ 
 vector<complex<double>> fft(const vector<complex<double>>& input) {
+    int N = input.size();
     vector<complex<double>> x = input;
-    int N = x.size();
 
     for (int step = N / 2; step >= 1; step /= 2) {
         int jump = step * 2;
@@ -20,21 +80,37 @@ vector<complex<double>> fft(const vector<complex<double>>& input) {
 
                 complex<double> a = x[start + k];
                 complex<double> b = x[start + k + step];
-
-                // Основные "бабочки" 
                 x[start + k] = a + b;
                 x[start + k + step] = (a - b) * w;
             }
         }
     }
 
-    return x;
+    // Битовая перестановка 
+    int bits = log2(N);
+    vector<complex<double>> y(N);
+    for (int i = 0; i < N; i++) {
+        int j = bit_reverse(i, bits);
+        y[j] = x[i];
+    }
+    return y;
 }
 
+// ОБПФ 
 vector<complex<double>> ifft(const vector<complex<double>>& input) {
+    int N = input.size();
     vector<complex<double>> x = input;
-    int N = x.size();
 
+    // Битовая перестановка В НАЧАЛЕ (для DIF)
+    int bits = log2(N);
+    vector<complex<double>> y(N);
+    for (int i = 0; i < N; i++) {
+        int j = bit_reverse(i, bits);
+        y[i] = x[j];
+    }
+    x = y;
+
+    // Стадии в обратном порядке
     for (int step = 1; step < N; step *= 2) {
         int jump = step * 2;
         for (int start = 0; start < N; start += jump) {
@@ -43,16 +119,16 @@ vector<complex<double>> ifft(const vector<complex<double>>& input) {
                 complex<double> w(cos(angle), sin(angle));
 
                 complex<double> a = x[start + k];
-                complex<double> b = x[start + k + step] * w;
-
-                x[start + k] = a + b;
-                x[start + k + step] = a - b;
+                complex<double> b = x[start + k + step];
+                x[start + k] = a + b * w;
+                x[start + k + step] = a - b * w;
             }
         }
     }
 
-    // нормализация
-    for (auto &v : x) v /= N;
+    // нормировка
+    for (auto &v : x)
+        v /= N;
 
     return x;
 }
