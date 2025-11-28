@@ -4,8 +4,8 @@ def generate_convolution_test_signals(x_filename="x_signal.bin", y_filename="y_s
     M = 1024
     L = 1024
 
-    t_x = np.linspace(0, 1, M)
-    t_y = np.linspace(0, 1, L)
+    t_x = np.linspace(0, 2, M)
+    t_y = np.linspace(0, 2, L)
 
     x_real = (0.7 * np.sin(2 * np.pi * 3 * t_x) +
               0.3 * np.sin(2 * np.pi * 8 * t_x) +

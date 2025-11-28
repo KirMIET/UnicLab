@@ -42,7 +42,7 @@ using namespace std;
 //     return x;
 // }
 
-// ДПФ (совместимо с numpy.fft)
+// ДПФ
 vector<complex<double>> dft(const vector<complex<double>>& x) {
     int N = x.size();
     vector<complex<double>> y(N);
@@ -54,12 +54,12 @@ vector<complex<double>> dft(const vector<complex<double>>& x) {
             complex<double> w(cos(angle), sin(angle));
             sum += x[j] * w;
         }
-        y[k] = sum; // без нормировки
+        y[k] = sum;
     }
     return y;
 }
 
-// Обратное ДПФ (совместимо с numpy.ifft)
+// Обратное ДПФ 
 vector<complex<double>> idft(const vector<complex<double>>& y) {
     int N = y.size();
     vector<complex<double>> x(N);
@@ -71,7 +71,7 @@ vector<complex<double>> idft(const vector<complex<double>>& y) {
             complex<double> w(cos(angle), sin(angle));
             sum += y[k] * w;
         }
-        x[j] = sum / (double)N; // делим только в обратном
+        x[j] = sum / (double)N; 
     }
     return x;
 }
